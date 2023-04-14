@@ -1,7 +1,6 @@
 package fail
 
 import (
-	"github.com/mephistolie/chefbook-backend-auth/pkg/logger"
 	"net/http"
 	"testing"
 )
@@ -54,7 +53,6 @@ func testGrpcErrorTransfer(
 
 	if expected.ErrorType != output.ErrorType || expected.Code != output.Code ||
 		expected.Message != output.Message {
-		logger.Error(output)
 		t.Fail()
 	}
 }

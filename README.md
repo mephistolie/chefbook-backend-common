@@ -1,2 +1,2 @@
-# ChefBook backend responses
-ChefBook backend responses lib for microservices communication
+# ChefBook Backend Common
+ChefBook backend lib with common parts
