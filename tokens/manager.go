@@ -1,6 +1,7 @@
 package tokens
 
 import (
+	"crypto/rsa"
 	"github.com/google/uuid"
 	"github.com/mephistolie/chefbook-backend-common/tokens/access"
 	"time"
@@ -30,6 +31,10 @@ func (m *Manager) CreateAccess(payload access.Payload, ttl time.Duration) (strin
 
 func (m *Manager) ParseAccess(token string) (access.Payload, error) {
 	return m.jwtParser.Parse(token)
+}
+
+func (m *Manager) GetAccessPublicKey() *rsa.PublicKey {
+	return m.jwtParser.Key
 }
 
 func (m *Manager) CreateRefresh() string {
