@@ -3,8 +3,8 @@ package mail
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"html/template"
+	"log"
 )
 
 type Sender interface {
@@ -20,7 +20,7 @@ type Payload struct {
 func (p *Payload) SetHtmlBody(templateFileName string, data interface{}) error {
 	t, err := template.ParseFiles(templateFileName)
 	if err != nil {
-		fmt.Printf("failed to parse file %s:%s", templateFileName, err.Error())
+		log.Printf("failed to parse file %s:%s", templateFileName, err.Error())
 		return err
 	}
 
