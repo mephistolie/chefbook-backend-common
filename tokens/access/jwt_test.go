@@ -1,6 +1,7 @@
 package access
 
 import (
+	"github.com/google/uuid"
 	"testing"
 	"time"
 )
@@ -9,14 +10,16 @@ const (
 	privateKeyPath = "../../tests/certs/test_rsa"
 	publicKeyPath  = "../../tests/certs/test_rsa.pub"
 
-	testUserId  = "1"
 	testEmail   = "test@test.com"
 	testRole    = "moderator"
 	testPremium = true
 	testTtl     = 30 * time.Minute
 )
 
-var testNickname = "test"
+var (
+	testUserId   = uuid.New()
+	testNickname = "test"
+)
 
 func TestJwtGeneration(t *testing.T) {
 	input := Payload{
