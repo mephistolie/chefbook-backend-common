@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 	"os"
 	"time"
 )
@@ -30,7 +31,7 @@ func (p *Producer) Produce(payload Payload, ttl time.Duration) (string, error) {
 	currentTime := time.Now().UTC()
 
 	claims := make(jwt.MapClaims)
-	claims[ClaimUserId] = payload.UserId
+	claims[ClaimUserId] = payload.UserId.String()
 	claims[ClaimEmail] = payload.Email
 	if payload.Nickname != nil {
 		claims[ClaimNickname] = *payload.Nickname
@@ -83,13 +84,17 @@ func (p *Parser) Parse(token string) (Payload, error) {
 		return Payload{}, fmt.Errorf("invalid token")
 	}
 
+	userId, err := uuid.Parse(claims[ClaimUserId].(string))
+	if err != nil {
+		return Payload{}, err
+	}
 	var nicknamePtr *string = nil
 	if nickname := claims[ClaimNickname].(string); len(nickname) > 0 {
 		nicknamePtr = &nickname
 	}
 
 	return Payload{
-		UserId:   claims[ClaimUserId].(string),
+		UserId:   userId,
 		Email:    claims[ClaimEmail].(string),
 		Nickname: nicknamePtr,
 		Role:     claims[ClaimRole].(string),

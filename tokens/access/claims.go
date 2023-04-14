@@ -1,5 +1,7 @@
 package access
 
+import "github.com/google/uuid"
+
 const (
 	ClaimUserId       = "sub"
 	ClaimEmail        = "eml"
@@ -12,7 +14,7 @@ const (
 )
 
 type Payload struct {
-	UserId   string
+	UserId   uuid.UUID
 	Email    string
 	Nickname *string
 	Role     string
