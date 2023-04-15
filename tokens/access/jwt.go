@@ -67,6 +67,15 @@ func NewParser(publicKeyPath string) (*Parser, error) {
 	return &Parser{Key: key}, nil
 }
 
+func NewParserByKey(data []byte) (*Parser, error) {
+	key, err := jwt.ParseRSAPublicKeyFromPEM(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Parser{Key: key}, nil
+}
+
 func (p *Parser) Parse(token string) (Payload, error) {
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (i interface{}, err error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
