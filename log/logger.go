@@ -42,9 +42,7 @@ func Init(
 
 func newLogger() *logrus.Logger {
 	l := logrus.New()
-	l.Formatter = &logrus.JSONFormatter{
-		PrettyPrint: true,
-	}
+	l.Formatter = &logrus.TextFormatter{FullTimestamp: true}
 	return l
 }
 
