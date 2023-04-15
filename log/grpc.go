@@ -9,3 +9,7 @@ type GrpcLogger struct {
 func Grpc() GrpcLogger {
 	return GrpcLogger{e}
 }
+
+func (g *GrpcLogger) V(l int) bool {
+	return false
+}
