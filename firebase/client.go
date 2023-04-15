@@ -18,8 +18,8 @@ type Client struct {
 	apiRoute  string
 }
 
-func NewClient(firebaseKeyPath, googleApiKey string) (*Client, error) {
-	opt := option.WithCredentialsFile(firebaseKeyPath)
+func NewClient(configPath, googleApiKey string) (*Client, error) {
+	opt := option.WithCredentialsFile(configPath)
 	firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func NewClient(firebaseKeyPath, googleApiKey string) (*Client, error) {
 		return nil, err
 	}
 
-	firestore, err := firebaseApp.Firestore(context.Background())
+	db, err := firebaseApp.Firestore(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func NewClient(firebaseKeyPath, googleApiKey string) (*Client, error) {
 	return &Client{
 		http:      http.Client{Timeout: 5 * time.Second},
 		auth:      *authClient,
-		firestore: *firestore,
+		firestore: *db,
 		apiRoute:  apiRoute,
 	}, nil
 }
