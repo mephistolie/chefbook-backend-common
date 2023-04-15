@@ -37,7 +37,7 @@ func (p *Producer) Produce(payload Payload, ttl time.Duration) (string, error) {
 		claims[ClaimNickname] = *payload.Nickname
 	}
 	claims[ClaimRole] = payload.Role
-	claims[ClaimPremium] = payload.Premium
+	claims[ClaimSubscriptionPlan] = payload.SubscriptionPlan
 	claims[ClaimExpiration] = currentTime.Add(ttl).Unix()
 	claims[ClaimIssuedAtTime] = currentTime.Unix()
 	claims[ClaimNotBefore] = currentTime.Unix()
@@ -94,10 +94,10 @@ func (p *Parser) Parse(token string) (Payload, error) {
 	}
 
 	return Payload{
-		UserId:   userId,
-		Email:    claims[ClaimEmail].(string),
-		Nickname: nicknamePtr,
-		Role:     claims[ClaimRole].(string),
-		Premium:  claims[ClaimPremium].(bool),
+		UserId:           userId,
+		Email:            claims[ClaimEmail].(string),
+		Nickname:         nicknamePtr,
+		Role:             claims[ClaimRole].(string),
+		SubscriptionPlan: claims[ClaimSubscriptionPlan].(string),
 	}, nil
 }

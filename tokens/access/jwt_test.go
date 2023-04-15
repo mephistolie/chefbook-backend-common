@@ -10,10 +10,10 @@ const (
 	privateKeyPath = "../../tests/certs/test_rsa"
 	publicKeyPath  = "../../tests/certs/test_rsa.pub"
 
-	testEmail   = "test@test.com"
-	testRole    = "moderator"
-	testPremium = true
-	testTtl     = 30 * time.Minute
+	testEmail            = "test@test.com"
+	testRole             = "moderator"
+	testSubscriptionPlan = "test_plan"
+	testTtl              = 30 * time.Minute
 )
 
 var (
@@ -23,11 +23,11 @@ var (
 
 func TestJwtGeneration(t *testing.T) {
 	input := Payload{
-		UserId:   testUserId,
-		Email:    testEmail,
-		Nickname: &testNickname,
-		Role:     testRole,
-		Premium:  testPremium,
+		UserId:           testUserId,
+		Email:            testEmail,
+		Nickname:         &testNickname,
+		Role:             testRole,
+		SubscriptionPlan: testSubscriptionPlan,
 	}
 
 	producer, err := NewProducer(privateKeyPath)
@@ -54,7 +54,7 @@ func TestJwtGeneration(t *testing.T) {
 		input.Email != output.Email ||
 		*input.Nickname != *output.Nickname ||
 		input.Role != output.Role ||
-		input.Premium != output.Premium {
+		input.SubscriptionPlan != output.SubscriptionPlan {
 		t.Fail()
 	}
 }
