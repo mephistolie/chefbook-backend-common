@@ -18,20 +18,24 @@ func Init(
 ) {
 	l := newLogger()
 
-	err := os.MkdirAll(path.Dir(logsPath), 0755)
-	if err != nil || os.IsExist(err) {
-		panic("can't create log dir")
-	}
+	writer := []io.Writer{os.Stdout}
+	if len(logsPath) > 0 {
+		err := os.MkdirAll(path.Dir(logsPath), 0755)
+		if err != nil || os.IsExist(err) {
+			panic("can't create log dir")
+		}
 
-	logFile, err := os.OpenFile(logsPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
-	if err != nil {
-		panic(fmt.Sprintf("can't open logs file: %s", err))
+		logFile, err := os.OpenFile(logsPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
+		if err != nil {
+			panic(fmt.Sprintf("can't open logs file: %s", err))
+		}
+		writer = []io.Writer{logFile, os.Stdout}
 	}
 
 	l.SetOutput(io.Discard)
 
 	l.AddHook(&writerHook{
-		Writer:    []io.Writer{logFile, os.Stdout},
+		Writer:    writer,
 		LogLevels: logrus.AllLevels,
 	})
 
