@@ -2,6 +2,7 @@ package access
 
 import (
 	"crypto/rsa"
+	"crypto/x509"
 	"fmt"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
@@ -68,7 +69,10 @@ func NewParser(publicKeyPath string) (*Parser, error) {
 }
 
 func NewParserByKey(data []byte) (*Parser, error) {
-	key, err := jwt.ParseRSAPublicKeyFromPEM(data)
+	key, err := x509.ParsePKCS1PublicKey(data)
+	if err != nil {
+		key, err = jwt.ParseRSAPublicKeyFromPEM(data)
+	}
 	if err != nil {
 		return nil, err
 	}
