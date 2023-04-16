@@ -59,7 +59,7 @@ func parseRecipe(snapshot *firestore.DocumentSnapshot) (Recipe, error) {
 	if recipe.Name, ok = doc["name"].(string); !ok {
 		return Recipe{}, errors.New(fmt.Sprintf("error during get name of recipe"))
 	}
-	recipe.IsFavourite = doc["favourite"].(bool)
+	recipe.IsFavourite, _ = doc["favourite"].(bool)
 	if servings, ok := doc["servings"].(int); ok && servings > 0 {
 		recipe.Servings = &servings
 	}
@@ -105,7 +105,11 @@ func parseIngredients(doc map[string]interface{}) ([]Ingredient, error) {
 func parseIngredient(item interface{}) (Ingredient, bool) {
 	var text string
 	var section bool
-	rawIngredient := item.(map[string]interface{})
+	var ok bool
+	rawIngredient, ok := item.(map[string]interface{})
+	if !ok {
+		return Ingredient{}, false
+	}
 
 	rawName := rawIngredient["item"]
 	if rawName == nil {
@@ -114,15 +118,15 @@ func parseIngredient(item interface{}) (Ingredient, bool) {
 			return Ingredient{}, false
 		}
 	}
-	text = rawName.(string)
+	if text, ok = rawName.(string); !ok {
+		return Ingredient{}, false
+	}
 
 	rawSection := rawIngredient["selected"]
 	if rawSection == nil {
 		rawSection = rawIngredient["section"]
 	}
-	if rawSection != nil {
-		section = rawSection.(bool)
-	}
+	section, _ = rawSection.(bool)
 
 	return Ingredient{
 		Text:    text,
@@ -149,12 +153,17 @@ func parseCooking(doc map[string]interface{}) ([]Step, error) {
 func parseStep(item interface{}) (Step, bool) {
 	var text string
 	var section bool
+	var ok bool
 	rawStep, ok := item.(map[string]interface{})
 	if ok {
-		text = rawStep["item"].(string)
-		section = rawStep["selected"].(bool)
+		if text, ok = rawStep["item"].(string); !ok {
+			return Step{}, false
+		}
+		section, _ = rawStep["selected"].(bool)
 	} else {
-		text = item.(string)
+		if text, ok = item.(string); !ok {
+			return Step{}, false
+		}
 	}
 
 	return Step{

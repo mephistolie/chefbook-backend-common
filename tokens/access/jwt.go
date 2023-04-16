@@ -97,20 +97,24 @@ func (p *Parser) Parse(token string) (Payload, error) {
 		return Payload{}, fmt.Errorf("invalid token")
 	}
 
-	userId, err := uuid.Parse(claims[ClaimUserId].(string))
+	userIdStr, _ := claims[ClaimUserId].(string)
+	userId, err := uuid.Parse(userIdStr)
 	if err != nil {
 		return Payload{}, err
 	}
+	email, _ := claims[ClaimEmail].(string)
 	var nicknamePtr *string = nil
-	if nickname := claims[ClaimNickname].(string); len(nickname) > 0 {
+	if nickname, ok := claims[ClaimNickname].(string); ok && len(nickname) > 0 {
 		nicknamePtr = &nickname
 	}
+	role, _ := claims[ClaimRole].(string)
+	plan, _ := claims[ClaimSubscriptionPlan].(string)
 
 	return Payload{
 		UserId:           userId,
-		Email:            claims[ClaimEmail].(string),
+		Email:            email,
 		Nickname:         nicknamePtr,
-		Role:             claims[ClaimRole].(string),
-		SubscriptionPlan: claims[ClaimSubscriptionPlan].(string),
+		Role:             role,
+		SubscriptionPlan: plan,
 	}, nil
 }

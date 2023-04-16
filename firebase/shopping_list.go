@@ -16,8 +16,10 @@ func (c *Client) GetShoppingList(localId string) (*ShoppingList, error) {
 	shoppingList := ShoppingList{}
 
 	if purchases, ok := doc["shoppingList"].([]interface{}); ok {
-		for _, purchase := range purchases {
-			shoppingList = append(shoppingList, purchase.(string))
+		for _, rawPurchase := range purchases {
+			if purchase, ok := rawPurchase.(string); ok {
+				shoppingList = append(shoppingList, purchase)
+			}
 		}
 	}
 
