@@ -34,7 +34,7 @@ func (c *Client) SignIn(email, password string) (SignInResponse, error) {
 
 	resp, err := c.http.Post(c.apiRoute, "application/json", bytes.NewBuffer(reqBody))
 	if err != nil || resp.StatusCode != http.StatusOK {
-		return SignInResponse{}, err
+		return SignInResponse{}, errors.New("invalid credentials")
 	}
 
 	var profile SignInResponse
