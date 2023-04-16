@@ -90,15 +90,20 @@ func ParseGrpc(err error) Response {
 	switch errStatus.Code() {
 	case codes.InvalidArgument:
 		response.Code, response.ErrorType = http.StatusBadRequest, TypeInvalidBody
+		response.Message = errStatus.Message()
 	case codes.Unauthenticated:
 		response.Code, response.ErrorType = http.StatusUnauthorized, TypeUnauthorized
+		response.Message = errStatus.Message()
 	case codes.PermissionDenied:
 		response.Code, response.ErrorType = http.StatusForbidden, TypeAccessDenied
+		response.Message = errStatus.Message()
 	case codes.NotFound:
 		response.Code, response.ErrorType = http.StatusNotFound, TypeNotFound
+		response.Message = errStatus.Message()
+	case codes.Unavailable:
+		response.Code, response.ErrorType = http.StatusServiceUnavailable, TypeUnavailable
+		response.Message = "service unavailable"
 	}
-
-	response.Message = errStatus.Message()
 
 	if len(errStatus.Details()) > 0 {
 		detail := errStatus.Details()[0]
