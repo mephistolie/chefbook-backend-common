@@ -19,7 +19,7 @@ func Postgres(params Params, migrationsPath string) {
 		log.Fatal(err)
 	}
 	log.Print("Connected to database. Applying migrations...")
-	if err := m.Up(); err != nil {
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		log.Fatal(err)
 	}
 	log.Print("Migrations applied successfully")
