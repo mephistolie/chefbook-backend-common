@@ -4,7 +4,7 @@ modules=(
   "hash"
   "log"
   "mail"
-  "migrations"
+  "migrate/sql"
   "random"
   "responses"
   "shutdown"
