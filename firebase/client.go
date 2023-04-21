@@ -18,8 +18,8 @@ type Client struct {
 	apiRoute  string
 }
 
-func NewClient(configPath, googleApiKey string) (*Client, error) {
-	opt := option.WithCredentialsFile(configPath)
+func NewClient(credentials []byte, googleApiKey string) (*Client, error) {
+	opt := option.WithCredentialsJSON(credentials)
 	firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		return nil, err
