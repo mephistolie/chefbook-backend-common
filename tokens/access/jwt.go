@@ -27,6 +27,18 @@ func NewProducer(privateKeyPath string) (*Producer, error) {
 	return &Producer{key: key}, nil
 }
 
+func NewProducerByKey(data []byte) (*Producer, error) {
+	key, err := x509.ParsePKCS1PrivateKey(data)
+	if err != nil {
+		key, err = jwt.ParseRSAPrivateKeyFromPEM(data)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return &Producer{key: key}, nil
+}
+
 func (p *Producer) Produce(payload Payload, ttl time.Duration) (string, error) {
 
 	currentTime := time.Now().UTC()

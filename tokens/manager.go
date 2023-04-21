@@ -25,6 +25,19 @@ func NewManager(privateKeyPath, publicKeyPath string) (*Manager, error) {
 	return &Manager{jwtProducer: *jwtProducer, jwtParser: *jwtParser}, nil
 }
 
+func NewManagerByKeys(privateKey, publicKey []byte) (*Manager, error) {
+	jwtProducer, err := access.NewProducerByKey(privateKey)
+	if err != nil {
+		return nil, err
+	}
+	jwtParser, err := access.NewParserByKey(publicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Manager{jwtProducer: *jwtProducer, jwtParser: *jwtParser}, nil
+}
+
 func (m *Manager) CreateAccess(payload access.Payload, ttl time.Duration) (string, error) {
 	return m.jwtProducer.Produce(payload, ttl)
 }
