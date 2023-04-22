@@ -14,29 +14,33 @@ type Producer struct {
 	key *rsa.PrivateKey
 }
 
-func NewProducer(privateKeyPath string) (*Producer, error) {
+func NewProducer(privateKeyPath string) (*Producer, *rsa.PublicKey, error) {
 	data, err := os.ReadFile(privateKeyPath)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	key, err := jwt.ParseRSAPrivateKeyFromPEM(data)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &Producer{key: key}, nil
+	return &Producer{key: key}, &key.PublicKey, nil
 }
 
-func NewProducerByKey(data []byte) (*Producer, error) {
+func NewProducerByRawKey(data []byte) (*Producer, *rsa.PublicKey, error) {
 	key, err := x509.ParsePKCS1PrivateKey(data)
 	if err != nil {
 		key, err = jwt.ParseRSAPrivateKeyFromPEM(data)
 	}
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &Producer{key: key}, nil
+	return &Producer{key: key}, &key.PublicKey, nil
+}
+
+func NewProducerByKey(key *rsa.PrivateKey) *Producer {
+	return &Producer{key: key}
 }
 
 func (p *Producer) Produce(payload Payload, ttl time.Duration) (string, error) {
@@ -80,7 +84,7 @@ func NewParser(publicKeyPath string) (*Parser, error) {
 	return &Parser{Key: key}, nil
 }
 
-func NewParserByKey(data []byte) (*Parser, error) {
+func NewParserByRawKey(data []byte) (*Parser, error) {
 	key, err := x509.ParsePKCS1PublicKey(data)
 	if err != nil {
 		key, err = jwt.ParseRSAPublicKeyFromPEM(data)
@@ -90,6 +94,10 @@ func NewParserByKey(data []byte) (*Parser, error) {
 	}
 
 	return &Parser{Key: key}, nil
+}
+
+func NewParserByKey(key *rsa.PublicKey) *Parser {
+	return &Parser{Key: key}
 }
 
 func (p *Parser) Parse(token string) (Payload, error) {

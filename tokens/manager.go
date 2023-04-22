@@ -12,12 +12,12 @@ type Manager struct {
 	jwtParser   access.Parser
 }
 
-func NewManager(privateKeyPath, publicKeyPath string) (*Manager, error) {
-	jwtProducer, err := access.NewProducer(privateKeyPath)
+func NewManager(privateKeyPath string) (*Manager, error) {
+	jwtProducer, publicKey, err := access.NewProducer(privateKeyPath)
 	if err != nil {
 		return nil, err
 	}
-	jwtParser, err := access.NewParser(publicKeyPath)
+	jwtParser := access.NewParserByKey(publicKey)
 	if err != nil {
 		return nil, err
 	}
@@ -25,12 +25,12 @@ func NewManager(privateKeyPath, publicKeyPath string) (*Manager, error) {
 	return &Manager{jwtProducer: *jwtProducer, jwtParser: *jwtParser}, nil
 }
 
-func NewManagerByKeys(privateKey, publicKey []byte) (*Manager, error) {
-	jwtProducer, err := access.NewProducerByKey(privateKey)
+func NewManagerByKey(privateKey []byte) (*Manager, error) {
+	jwtProducer, publicKey, err := access.NewProducerByRawKey(privateKey)
 	if err != nil {
 		return nil, err
 	}
-	jwtParser, err := access.NewParserByKey(publicKey)
+	jwtParser := access.NewParserByKey(publicKey)
 	if err != nil {
 		return nil, err
 	}
