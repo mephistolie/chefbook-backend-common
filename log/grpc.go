@@ -4,6 +4,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"strings"
 )
 
 type GrpcLogger struct {
@@ -19,5 +20,10 @@ func (g GrpcLogger) V(l int) bool {
 }
 
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	return grpc_logrus.UnaryServerInterceptor(e)
+	healthCheckDecider := func(fullMethodName string, err error) bool {
+		isHealthCheck := strings.Contains(fullMethodName, "Health") && strings.Contains(fullMethodName, "Check")
+		return err != nil || !isHealthCheck
+	}
+	healthCheckOption := grpc_logrus.WithDecider(healthCheckDecider)
+	return grpc_logrus.UnaryServerInterceptor(e, healthCheckOption)
 }
