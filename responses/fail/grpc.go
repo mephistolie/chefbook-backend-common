@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	GrpcUnknown = CreateGrpcClient(TypeUnknown, "unknown error")
+	GrpcUnknown = CreateGrpcServer(TypeUnknown, "unknown error")
 
 	GrpcInvalidBody         = CreateGrpcClient(TypeInvalidBody, "invalid request body")
 	GrpcBigFile             = CreateGrpcClient(TypeInvalidBody, "file too big")
