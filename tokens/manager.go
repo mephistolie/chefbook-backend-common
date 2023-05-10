@@ -25,7 +25,7 @@ func NewManager(privateKeyPath string) (*Manager, error) {
 	return &Manager{jwtProducer: *jwtProducer, jwtParser: *jwtParser}, nil
 }
 
-func NewManagerByKey(privateKey []byte) (*Manager, error) {
+func NewManagerByRawKey(privateKey []byte) (*Manager, error) {
 	jwtProducer, publicKey, err := access.NewProducerByRawKey(privateKey)
 	if err != nil {
 		return nil, err
@@ -36,6 +36,12 @@ func NewManagerByKey(privateKey []byte) (*Manager, error) {
 	}
 
 	return &Manager{jwtProducer: *jwtProducer, jwtParser: *jwtParser}, nil
+}
+
+func NewManagerByKey(privateKey *rsa.PrivateKey) *Manager {
+	jwtProducer := access.NewProducerByKey(privateKey)
+	jwtParser := access.NewParserByKey(&privateKey.PublicKey)
+	return &Manager{jwtProducer: *jwtProducer, jwtParser: *jwtParser}
 }
 
 func (m *Manager) CreateAccess(payload access.Payload, ttl time.Duration) (string, error) {
