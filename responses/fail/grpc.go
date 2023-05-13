@@ -35,6 +35,10 @@ func CreateGrpcNotFound(errorType string, errorMessage string) error {
 	return createGrpc(errorType, errorMessage, codes.NotFound)
 }
 
+func CreateGrpcConflict(errorType string, errorMessage string) error {
+	return createGrpc(errorType, errorMessage, codes.FailedPrecondition)
+}
+
 func CreateGrpcServer(errorType string, errorMessage string) error {
 	return createGrpc(errorType, errorMessage, codes.Internal)
 }
@@ -61,6 +65,8 @@ func createGrpcWithHttpCode(
 		grpcCode = codes.PermissionDenied
 	case http.StatusNotFound:
 		grpcCode = codes.NotFound
+	case http.StatusConflict:
+		grpcCode = codes.FailedPrecondition
 	}
 
 	return createGrpc(errorType, errorMessage, grpcCode)
@@ -99,6 +105,9 @@ func ParseGrpc(err error) Response {
 		response.Message = errStatus.Message()
 	case codes.NotFound:
 		response.Code, response.ErrorType = http.StatusNotFound, TypeNotFound
+		response.Message = errStatus.Message()
+	case codes.FailedPrecondition:
+		response.Code, response.ErrorType = http.StatusConflict, TypeConflict
 		response.Message = errStatus.Message()
 	case codes.Unavailable:
 		response.Code, response.ErrorType = http.StatusServiceUnavailable, TypeUnavailable

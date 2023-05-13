@@ -6,6 +6,7 @@ const (
 	TypeUnauthorized = "unauthorized"
 	TypeAccessDenied = "access_denied"
 	TypeNotFound     = "not_found"
+	TypeConflict     = "conflict"
 	TypeUnavailable  = "unavailable"
 )
 
