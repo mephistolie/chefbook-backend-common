@@ -14,7 +14,8 @@ var (
 	GrpcBigFile             = CreateGrpcClient(TypeInvalidBody, "file too big")
 	GrpcUnsupportedFileType = CreateGrpcClient(TypeInvalidBody, "unsupported file type")
 
-	GrpcAccessDenied = CreateGrpcAccessDenied(TypeAccessDenied, "access denied")
+	GrpcAccessDenied    = CreateGrpcAccessDenied(TypeAccessDenied, "access denied")
+	GrpcPremiumRequired = CreateGrpcAccessDenied(TypePremiumRequired, "premium subscription required for this functionality")
 
 	GrpcNotFound = CreateGrpcClient(TypeNotFound, "not found")
 )
