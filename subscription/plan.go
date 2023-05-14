@@ -6,3 +6,7 @@ var (
 )
 
 type Plan string
+
+func IsPremium(plan string) bool {
+	return plan == string(PlanPremium)
+}
