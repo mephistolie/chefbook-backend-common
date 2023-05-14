@@ -8,7 +8,6 @@ import (
 
 const (
 	privateKeyPath = "../../tests/certs/test_rsa"
-	publicKeyPath  = "../../tests/certs/test_rsa.pub"
 
 	testEmail            = "test@test.com"
 	testRole             = "moderator"
@@ -30,15 +29,12 @@ func TestJwtGeneration(t *testing.T) {
 		SubscriptionPlan: testSubscriptionPlan,
 	}
 
-	producer, err := NewProducer(privateKeyPath)
+	producer, publicKey, err := NewProducer(privateKeyPath)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	parser, err := NewParser(publicKeyPath)
-	if err != nil {
-		t.Fatal(err)
-	}
+	parser := NewParserByKey(publicKey)
 
 	token, err := producer.Produce(input, testTtl)
 	if err != nil {
