@@ -110,6 +110,9 @@ func ParseGrpc(err error) Response {
 	case codes.FailedPrecondition:
 		response.Code, response.ErrorType = http.StatusConflict, TypeConflict
 		response.Message = errStatus.Message()
+	case codes.Internal:
+		response.Code, response.ErrorType = http.StatusInternalServerError, TypeUnknown
+		response.Message = errStatus.Message()
 	case codes.Unavailable:
 		response.Code, response.ErrorType = http.StatusServiceUnavailable, TypeUnavailable
 		response.Message = "service unavailable"
