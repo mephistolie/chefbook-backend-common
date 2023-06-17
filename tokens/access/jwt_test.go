@@ -27,6 +27,7 @@ func TestJwtGeneration(t *testing.T) {
 		Nickname:         &testNickname,
 		Role:             testRole,
 		SubscriptionPlan: testSubscriptionPlan,
+		Deleted:          true,
 	}
 
 	producer, publicKey, err := NewProducer(privateKeyPath)

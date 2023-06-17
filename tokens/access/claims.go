@@ -8,6 +8,7 @@ const (
 	ClaimNickname         = "nik"
 	ClaimRole             = "rol"
 	ClaimSubscriptionPlan = "pln"
+	ClaimDeleted          = "del"
 	ClaimExpiration       = "exp"
 	ClaimNotBefore        = "nbf"
 	ClaimIssuedAtTime     = "iat"
@@ -19,4 +20,5 @@ type Payload struct {
 	Nickname         *string
 	Role             string
 	SubscriptionPlan string
+	Deleted          bool
 }
