@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 )
 
 const (
@@ -12,14 +13,15 @@ const (
 )
 
 type Recipe struct {
-	Name        string
-	IsFavourite bool
-	Categories  []string
-	Servings    *int
-	Time        *string
-	Calories    *int
-	Ingredients []Ingredient
-	Cooking     []Step
+	Name              string
+	IsFavourite       bool
+	Categories        []string
+	Servings          *int64
+	Time              *string
+	Calories          *int64
+	Ingredients       []Ingredient
+	Cooking           []Step
+	CreationTimestamp *time.Time
 }
 
 type Ingredient struct {
@@ -60,14 +62,17 @@ func parseRecipe(snapshot *firestore.DocumentSnapshot) (Recipe, error) {
 		return Recipe{}, errors.New(fmt.Sprintf("error during get name of recipe"))
 	}
 	recipe.IsFavourite, _ = doc["favourite"].(bool)
-	if servings, ok := doc["servings"].(int); ok && servings > 0 {
+	if servings, ok := doc["servings"].(int64); ok && servings > 0 {
 		recipe.Servings = &servings
 	}
-	if time, ok := doc["time"].(string); ok && len(time) > 0 {
-		recipe.Time = &time
+	if cookingTime, ok := doc["time"].(string); ok && len(cookingTime) > 0 {
+		recipe.Time = &cookingTime
 	}
-	if calories, ok := doc["calories"].(int); ok && calories > 0 {
+	if calories, ok := doc["calories"].(int64); ok && calories > 0 {
 		recipe.Calories = &calories
+	}
+	if creationDate, ok := doc["creationDate"].(time.Time); ok {
+		recipe.CreationTimestamp = &creationDate
 	}
 
 	if categories, ok := doc["categories"].([]interface{}); ok {
