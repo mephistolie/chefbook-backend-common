@@ -17,7 +17,7 @@ type Publisher struct {
 	outbox            outbox.Outbox
 }
 
-func NewPublisher(appId string, cfg config.Amqp, outbox outbox.Outbox) (*Publisher, error) {
+func New(appId string, cfg config.Amqp, outbox outbox.Outbox) (*Publisher, error) {
 	url := fmt.Sprintf("amqp://%s:%s@%s:%d/%s", *cfg.User, *cfg.Password, *cfg.Host, *cfg.Port, *cfg.VHost)
 	conn, err := amqp.NewConn(url)
 	if err != nil {

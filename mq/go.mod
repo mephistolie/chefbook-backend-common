@@ -4,8 +4,10 @@ go 1.20
 
 require (
 	github.com/google/uuid v1.3.0
+	github.com/mephistolie/chefbook-backend-auth/api v1.6.0
 	github.com/mephistolie/chefbook-backend-common/log v0.6.0
 	github.com/wagslane/go-rabbitmq v0.12.3
+	k8s.io/utils v0.0.0-20230505201702-9f6742963106
 )
 
 require (
