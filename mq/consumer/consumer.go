@@ -19,8 +19,8 @@ type Consumer struct {
 }
 
 type Params struct {
-	queueName string
-	options   []func(*amqp.ConsumerOptions)
+	QueueName string
+	Options   []func(*amqp.ConsumerOptions)
 }
 
 func New(cfg config.Amqp, inbox dependencies.Inbox, supportedMsgTypes []string) (*Consumer, error) {
@@ -42,8 +42,8 @@ func (s *Consumer) Start(consumers ...Params) error {
 		consumer, err := amqp.NewConsumer(
 			s.conn,
 			s.handleDelivery,
-			consumerParams.queueName,
-			consumerParams.options...,
+			consumerParams.QueueName,
+			consumerParams.Options...,
 		)
 		if err != nil {
 			return err
