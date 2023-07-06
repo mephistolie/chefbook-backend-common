@@ -1,12 +1,15 @@
 package subscription
 
 var (
-	PlanFree    Plan = "free"
-	PlanPremium Plan = "premium"
+	PlanFree    = "free"
+	PlanPremium = "premium"
+	PlanMaximum = "maximum"
 )
 
-type Plan string
-
 func IsPremium(plan string) bool {
-	return plan == string(PlanPremium)
+	return plan == PlanPremium || plan == string(PlanMaximum)
+}
+
+func IsMaximum(plan string) bool {
+	return plan == string(PlanMaximum)
 }
