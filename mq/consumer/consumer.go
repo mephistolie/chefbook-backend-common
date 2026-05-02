@@ -41,7 +41,6 @@ func (s *Consumer) Start(consumers ...Params) error {
 	for _, consumerParams := range consumers {
 		consumer, err := amqp.NewConsumer(
 			s.conn,
-			s.handleDelivery,
 			consumerParams.QueueName,
 			consumerParams.Options...,
 		)
@@ -49,6 +48,11 @@ func (s *Consumer) Start(consumers ...Params) error {
 			return err
 		}
 		s.consumers = append(s.consumers, consumer)
+		go func(consumer *amqp.Consumer) {
+			if err := consumer.Run(s.handleDelivery); err != nil {
+				log.Warnf("rabbitmq consumer stopped with error: %s", err)
+			}
+		}(consumer)
 	}
 
 	return nil
@@ -62,7 +66,7 @@ func (s *Consumer) handleDelivery(delivery amqp.Delivery) amqp.Action {
 	}
 
 	if !slices.Contains(s.supportedMsgTypes, delivery.Type) {
-		log.Infof("unsupported message type: ", delivery.Type)
+		log.Infof("unsupported message type: %s", delivery.Type)
 		return amqp.NackDiscard
 	}
 
