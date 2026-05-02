@@ -68,6 +68,8 @@ func createGrpcWithHttpCode(
 		grpcCode = codes.NotFound
 	case http.StatusConflict:
 		grpcCode = codes.FailedPrecondition
+	case http.StatusInternalServerError:
+		grpcCode = codes.Internal
 	}
 
 	return createGrpc(errorType, errorMessage, grpcCode)

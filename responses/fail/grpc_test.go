@@ -53,6 +53,6 @@ func testGrpcErrorTransfer(
 
 	if expected.ErrorType != output.ErrorType || expected.Code != output.Code ||
 		expected.Message != output.Message {
-		t.Fail()
+		t.Fatalf("expected %+v, got %+v", expected, output)
 	}
 }

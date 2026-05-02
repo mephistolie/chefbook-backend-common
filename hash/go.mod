@@ -1,5 +1,5 @@
 module github.com/mephistolie/chefbook-backend-common/hash
 
-go 1.20
+go 1.26.2
 
-require golang.org/x/crypto v0.8.0
+require golang.org/x/crypto v0.50.0

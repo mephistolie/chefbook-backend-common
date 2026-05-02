@@ -1,6 +1,6 @@
 module github.com/mephistolie/chefbook-backend-common/mail
 
-go 1.20
+go 1.26.2
 
 require github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 
