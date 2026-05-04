@@ -35,7 +35,11 @@ type Step struct {
 }
 
 func (c *Client) GetRecipes(localId string) ([]Recipe, error) {
-	iterator := c.firestore.Collection(collectionUsers).Doc(localId).Collection(collectionRecipes).Documents(context.Background())
+	return c.GetRecipesWithContext(context.Background(), localId)
+}
+
+func (c *Client) GetRecipesWithContext(ctx context.Context, localId string) ([]Recipe, error) {
+	iterator := c.firestore.Collection(collectionUsers).Doc(localId).Collection(collectionRecipes).Documents(ctx)
 	snapshots, err := iterator.GetAll()
 	if err != nil {
 		return []Recipe{}, err

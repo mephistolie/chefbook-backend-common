@@ -19,30 +19,30 @@ type Profile struct {
 	CreationTimestamp time.Time
 }
 
-func (c *Client) GetProfile(context context.Context, userId string) (Profile, error) {
-	record, err := c.auth.GetUser(context, userId)
+func (c *Client) GetProfile(ctx context.Context, userId string) (Profile, error) {
+	record, err := c.auth.GetUser(ctx, userId)
 	if err != nil {
 		return Profile{}, err
 	}
-	return c.collectProfileData(*record)
+	return c.collectProfileData(ctx, *record)
 }
 
-func (c *Client) GetProfileByEmail(context context.Context, email string) (Profile, error) {
-	record, err := c.auth.GetUserByEmail(context, email)
+func (c *Client) GetProfileByEmail(ctx context.Context, email string) (Profile, error) {
+	record, err := c.auth.GetUserByEmail(ctx, email)
 	if err != nil {
 		return Profile{}, err
 	}
-	return c.collectProfileData(*record)
+	return c.collectProfileData(ctx, *record)
 }
 
-func (c *Client) collectProfileData(record auth.UserRecord) (Profile, error) {
+func (c *Client) collectProfileData(ctx context.Context, record auth.UserRecord) (Profile, error) {
 	profile := Profile{
 		Id:                record.UID,
 		Email:             record.Email,
 		CreationTimestamp: time.UnixMilli(record.UserMetadata.CreationTimestamp),
 	}
 
-	snapshot, err := c.firestore.Collection(collectionUsers).Doc(profile.Id).Get(context.Background())
+	snapshot, err := c.firestore.Collection(collectionUsers).Doc(profile.Id).Get(ctx)
 	if err != nil {
 		return Profile{}, err
 	}

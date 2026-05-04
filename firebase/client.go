@@ -19,18 +19,22 @@ type Client struct {
 }
 
 func NewClient(credentials []byte, googleApiKey string) (*Client, error) {
+	return NewClientWithContext(context.Background(), credentials, googleApiKey)
+}
+
+func NewClientWithContext(ctx context.Context, credentials []byte, googleApiKey string) (*Client, error) {
 	opt := option.WithCredentialsJSON(credentials)
-	firebaseApp, err := firebase.NewApp(context.Background(), nil, opt)
+	firebaseApp, err := firebase.NewApp(ctx, nil, opt)
 	if err != nil {
 		return nil, err
 	}
 
-	authClient, err := firebaseApp.Auth(context.Background())
+	authClient, err := firebaseApp.Auth(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	db, err := firebaseApp.Firestore(context.Background())
+	db, err := firebaseApp.Firestore(ctx)
 	if err != nil {
 		return nil, err
 	}

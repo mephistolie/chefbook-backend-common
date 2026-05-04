@@ -7,7 +7,11 @@ import (
 type ShoppingList []string
 
 func (c *Client) GetShoppingList(localId string) (*ShoppingList, error) {
-	snapshot, err := c.firestore.Collection(collectionUsers).Doc(localId).Get(context.Background())
+	return c.GetShoppingListWithContext(context.Background(), localId)
+}
+
+func (c *Client) GetShoppingListWithContext(ctx context.Context, localId string) (*ShoppingList, error) {
+	snapshot, err := c.firestore.Collection(collectionUsers).Doc(localId).Get(ctx)
 	if err != nil {
 		return nil, err
 	}
