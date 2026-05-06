@@ -1,18 +1,18 @@
 package log
 
 import (
-	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
-	"github.com/sirupsen/logrus"
+	"context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 	"strings"
+	"time"
 )
 
 type GrpcLogger struct {
-	*logrus.Entry
 }
 
 func Grpc() GrpcLogger {
-	return GrpcLogger{e}
+	return GrpcLogger{}
 }
 
 func (g GrpcLogger) V(l int) bool {
@@ -20,10 +20,36 @@ func (g GrpcLogger) V(l int) bool {
 }
 
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	healthCheckDecider := func(fullMethodName string, err error) bool {
-		isHealthCheck := strings.Contains(fullMethodName, "Health") && strings.Contains(fullMethodName, "Check")
-		return err != nil || !isHealthCheck
+	return func(
+		ctx context.Context,
+		req any,
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (any, error) {
+		start := time.Now()
+		resp, err := handler(ctx, req)
+
+		code := status.Code(err)
+		event := Event{
+			Event:      "grpc.request.completed",
+			Message:    "gRPC request completed",
+			Component:  ComponentGRPC,
+			Operation:  info.FullMethod,
+			Duration:   time.Since(start),
+			GRPCMethod: info.FullMethod,
+			GRPCCode:   code.String(),
+		}
+
+		if err != nil {
+			LogError(ctx, event, err)
+		} else if !isHealthCheck(info.FullMethod) {
+			Log(ctx, event)
+		}
+
+		return resp, err
 	}
-	healthCheckOption := grpc_logrus.WithDecider(healthCheckDecider)
-	return grpc_logrus.UnaryServerInterceptor(e, healthCheckOption)
+}
+
+func isHealthCheck(fullMethodName string) bool {
+	return strings.Contains(fullMethodName, "Health") && strings.Contains(fullMethodName, "Check")
 }

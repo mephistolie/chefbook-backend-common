@@ -2,23 +2,40 @@ package log
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"path"
+	"time"
+
+	"github.com/rs/zerolog"
 )
 
 var (
-	e *logrus.Entry
+	logger      zerolog.Logger
+	serviceName = "unknown"
+	environment = EnvProd
 )
+
+func init() {
+	logger = newLogger(os.Stdout, serviceName, environment, false)
+}
 
 func Init(
 	logsPath string,
 	debug bool,
 ) {
-	l := newLogger()
+	InitWithService("unknown", logsPath, debug)
+}
 
-	writer := []io.Writer{os.Stdout}
+func InitWithService(
+	service string,
+	logsPath string,
+	debug bool,
+) {
+	serviceName = service
+	environment = getEnvironment(debug)
+
+	writer := io.Writer(os.Stdout)
 	if len(logsPath) > 0 {
 		err := os.MkdirAll(path.Dir(logsPath), 0755)
 		if err != nil || os.IsExist(err) {
@@ -29,31 +46,38 @@ func Init(
 		if err != nil {
 			panic(fmt.Sprintf("can't open logs file: %s", err))
 		}
-		writer = []io.Writer{logFile, os.Stdout}
+		writer = zerolog.MultiLevelWriter(logFile, os.Stdout)
 	}
 
-	l.SetOutput(io.Discard)
-
-	l.AddHook(&writerHook{
-		Writer:    writer,
-		LogLevels: logrus.AllLevels,
-	})
-
-	l.SetLevel(getLogLevel(debug))
-
-	e = logrus.NewEntry(l)
+	logger = newLogger(writer, serviceName, environment, debug)
 }
 
-func newLogger() *logrus.Logger {
-	l := logrus.New()
-	l.Formatter = &logrus.TextFormatter{FullTimestamp: true}
-	return l
+func newLogger(writer io.Writer, service string, env Environment, debug bool) zerolog.Logger {
+	zerolog.TimestampFieldName = "timestamp"
+	zerolog.MessageFieldName = "message"
+	zerolog.ErrorFieldName = FieldError
+	zerolog.TimeFieldFormat = time.RFC3339Nano
+	zerolog.SetGlobalLevel(getLogLevel(debug))
+
+	return zerolog.New(writer).
+		With().
+		Timestamp().
+		Str(FieldService, service).
+		Str(FieldEnvironment, string(env)).
+		Logger()
 }
 
-func getLogLevel(debug bool) logrus.Level {
-	logLevel := logrus.InfoLevel
+func getLogLevel(debug bool) zerolog.Level {
+	logLevel := zerolog.InfoLevel
 	if debug {
-		logLevel = logrus.TraceLevel
+		logLevel = zerolog.TraceLevel
 	}
 	return logLevel
+}
+
+func getEnvironment(debug bool) Environment {
+	if debug {
+		return EnvDev
+	}
+	return EnvProd
 }

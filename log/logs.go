@@ -1,70 +1,138 @@
 package log
 
 import (
+	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
-	"path"
-	"runtime"
+
+	"github.com/rs/zerolog"
 )
 
 func Trace(msg ...interface{}) {
-	callerLogger().Trace(msg...)
+	legacyEvent(logger.Trace(), msg...)
 }
 
 func Tracef(format string, args ...interface{}) {
-	callerLogger().Tracef(format, args...)
+	logger.Trace().Msgf(format, args...)
 }
 
 func Debug(msg ...interface{}) {
-	callerLogger().Debug(msg...)
+	legacyEvent(logger.Debug(), msg...)
 }
 
 func Debugf(format string, args ...interface{}) {
-	callerLogger().Debugf(format, args...)
+	logger.Debug().Msgf(format, args...)
 }
 
 func Info(msg ...interface{}) {
-	callerLogger().Info(msg...)
+	legacyEvent(logger.Info(), msg...)
 }
 
 func Infof(format string, args ...interface{}) {
-	callerLogger().Infof(format, args...)
+	logger.Info().Msgf(format, args...)
 }
 
 func Warn(msg ...interface{}) {
-	callerLogger().Warn(msg...)
+	legacyEvent(logger.Warn(), msg...)
 }
 
 func Warnf(format string, args ...interface{}) {
-	callerLogger().Warnf(format, args...)
+	logger.Warn().Msgf(format, args...)
 }
 
 func Error(msg ...interface{}) {
-	callerLogger().Error(msg...)
+	legacyEvent(logger.Error(), msg...)
 }
 
 func Errorf(format string, args ...interface{}) {
-	callerLogger().Errorf(format, args...)
+	logger.Error().Msgf(format, args...)
 }
 
 func Fatal(msg ...interface{}) {
-	callerLogger().Fatal(msg...)
+	legacyEvent(logger.Fatal(), msg...)
 }
 
 func Fatalf(format string, args ...interface{}) {
-	callerLogger().Fatalf(format, args...)
+	logger.Fatal().Msgf(format, args...)
 }
 
-func callerLogger() *logrus.Entry {
-	pc, file, line, ok := runtime.Caller(2)
-	if !ok {
-		return e
+func Log(ctx context.Context, event Event) {
+	writeEvent(logger.Info().Ctx(ctx), event, nil)
+}
+
+func LogDebug(ctx context.Context, event Event) {
+	writeEvent(logger.Debug().Ctx(ctx), event, nil)
+}
+
+func LogWarn(ctx context.Context, event Event) {
+	writeEvent(logger.Warn().Ctx(ctx), event, nil)
+}
+
+func LogError(ctx context.Context, event Event, err error) {
+	writeEvent(logger.Error().Ctx(ctx), event, err)
+}
+
+func legacyEvent(event *zerolog.Event, msg ...interface{}) {
+	event.
+		Str(FieldEvent, "legacy.log").
+		Msg(fmt.Sprint(msg...))
+}
+
+func writeEvent(logEvent *zerolog.Event, event Event, err error) {
+	if event.Event == "" {
+		event.Event = "unknown"
 	}
-	fun := runtime.FuncForPC(pc)
+	if event.Message == "" {
+		event.Message = event.Event
+	}
 
-	fields := logrus.Fields{}
-	fields["file"] = fmt.Sprintf("%s:%d", path.Base(file), line)
-	fields["func"] = fmt.Sprintf("%s()", fun.Name())
-
-	return e.WithFields(fields)
+	logEvent = logEvent.Str(FieldEvent, event.Event)
+	if event.Component != "" {
+		logEvent = logEvent.Str(FieldComponent, event.Component)
+	}
+	if event.RequestID != "" {
+		logEvent = logEvent.Str(FieldRequestID, event.RequestID)
+	}
+	if event.TraceID != "" {
+		logEvent = logEvent.Str(FieldTraceID, event.TraceID)
+	}
+	if event.SpanID != "" {
+		logEvent = logEvent.Str(FieldSpanID, event.SpanID)
+	}
+	if event.UserID != "" {
+		logEvent = logEvent.Str(FieldUserID, event.UserID)
+	}
+	if event.MessageID != "" {
+		logEvent = logEvent.Str(FieldMessageID, event.MessageID)
+	}
+	if event.Operation != "" {
+		logEvent = logEvent.Str(FieldOperation, event.Operation)
+	}
+	if event.Duration > 0 {
+		logEvent = logEvent.Int64(FieldDurationMs, event.Duration.Milliseconds())
+	}
+	if event.ErrorType != "" {
+		logEvent = logEvent.Str(FieldErrorType, event.ErrorType)
+	}
+	if event.GRPCMethod != "" {
+		logEvent = logEvent.Str(FieldGRPCMethod, event.GRPCMethod)
+	}
+	if event.GRPCCode != "" {
+		logEvent = logEvent.Str(FieldGRPCCode, event.GRPCCode)
+	}
+	if event.HTTPMethod != "" {
+		logEvent = logEvent.Str(FieldHTTPMethod, event.HTTPMethod)
+	}
+	if event.HTTPPath != "" {
+		logEvent = logEvent.Str(FieldHTTPPath, event.HTTPPath)
+	}
+	if event.HTTPStatus > 0 {
+		logEvent = logEvent.Int(FieldHTTPStatus, event.HTTPStatus)
+	}
+	if event.Payload != nil {
+		logEvent = logEvent.Interface(FieldPayload, event.Payload)
+	}
+	if err != nil {
+		logEvent = logEvent.Err(err)
+	}
+	logEvent.Msg(event.Message)
 }
