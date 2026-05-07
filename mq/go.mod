@@ -4,7 +4,7 @@ go 1.26.2
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/mephistolie/chefbook-backend-common/log v0.7.0
+	github.com/mephistolie/chefbook-backend-common/log v0.8.0
 	github.com/wagslane/go-rabbitmq v0.15.0
 	k8s.io/utils v0.0.0-20260319190234-28399d86e0b5
 )

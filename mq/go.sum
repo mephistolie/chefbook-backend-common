@@ -50,6 +50,8 @@ github.com/mephistolie/chefbook-backend-common/log v0.6.0 h1:ucdztSs/6cdnl5zccMu
 github.com/mephistolie/chefbook-backend-common/log v0.6.0/go.mod h1:+X8G15pzJU74a+CF5nsqwszvCWlLoBb2qCuaT0O+690=
 github.com/mephistolie/chefbook-backend-common/log v0.7.0 h1:gaL5vrhev/nu0sfaUNf1BiFTgpn4QPzeA1u+LMob+OM=
 github.com/mephistolie/chefbook-backend-common/log v0.7.0/go.mod h1:WZbnq7CiAcaF+XxE1hvyMuMSSxfDTcE134jg1C6SYTE=
+github.com/mephistolie/chefbook-backend-common/log v0.8.0 h1:1IzYSyndxwuSc8izCskG5KkAMv45uslFYZhKRVke9Sw=
+github.com/mephistolie/chefbook-backend-common/log v0.8.0/go.mod h1:WZbnq7CiAcaF+XxE1hvyMuMSSxfDTcE134jg1C6SYTE=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

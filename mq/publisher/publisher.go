@@ -1,13 +1,15 @@
 package publisher
 
 import (
+	"context"
 	"fmt"
+	"time"
+
 	"github.com/mephistolie/chefbook-backend-common/log"
 	"github.com/mephistolie/chefbook-backend-common/mq/config"
 	outbox "github.com/mephistolie/chefbook-backend-common/mq/dependencies"
 	"github.com/mephistolie/chefbook-backend-common/mq/model"
 	amqp "github.com/wagslane/go-rabbitmq"
-	"time"
 )
 
 type Publisher struct {
@@ -64,7 +66,16 @@ func (p *Publisher) observeOutbox() {
 }
 
 func (p *Publisher) PublishMessage(msg *model.MessageData) error {
-	log.Infof("publishing message %s with type %s to exchange %s...", msg.Id, msg.Type, msg.Exchange)
+	log.Log(context.Background(), log.Event{
+		Event:     "mq.message.publishing",
+		Message:   "publishing message",
+		Component: log.ComponentAMQP,
+		MessageID: msg.Id.String(),
+		Payload: map[string]any{
+			"message_type": msg.Type,
+			"exchange":     msg.Exchange,
+		},
+	})
 	err := p.publisherProfiles.Publish(
 		msg.Body,
 		[]string{""},
@@ -76,9 +87,27 @@ func (p *Publisher) PublishMessage(msg *model.MessageData) error {
 		amqp.WithPublishOptionsAppID(p.appId),
 	)
 	if err == nil {
-		log.Infof("message %s with type %s sent successfully", msg.Id, msg.Type)
+		log.Log(context.Background(), log.Event{
+			Event:     "mq.message.published",
+			Message:   "message published",
+			Component: log.ComponentAMQP,
+			MessageID: msg.Id.String(),
+			Payload: map[string]any{
+				"message_type": msg.Type,
+				"exchange":     msg.Exchange,
+			},
+		})
 	} else {
-		log.Warnf("unable to send message %s with type %s: %s", msg.Id, msg.Type, err)
+		log.LogWarnError(context.Background(), log.Event{
+			Event:     "mq.message.publish_failed",
+			Message:   "unable to publish message",
+			Component: log.ComponentAMQP,
+			MessageID: msg.Id.String(),
+			Payload: map[string]any{
+				"message_type": msg.Type,
+				"exchange":     msg.Exchange,
+			},
+		}, err)
 	}
 
 	if err == nil {

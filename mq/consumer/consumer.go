@@ -1,7 +1,9 @@
 package consumer
 
 import (
+	"context"
 	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/mephistolie/chefbook-backend-common/log"
 	"github.com/mephistolie/chefbook-backend-common/mq/config"
@@ -50,7 +52,11 @@ func (s *Consumer) Start(consumers ...Params) error {
 		s.consumers = append(s.consumers, consumer)
 		go func(consumer *amqp.Consumer) {
 			if err := consumer.Run(s.handleDelivery); err != nil {
-				log.Warnf("rabbitmq consumer stopped with error: %s", err)
+				log.LogWarnError(context.Background(), log.Event{
+					Event:     "mq.consumer.stopped",
+					Message:   "rabbitmq consumer stopped with error",
+					Component: log.ComponentAMQP,
+				}, err)
 			}
 		}(consumer)
 	}
@@ -61,12 +67,29 @@ func (s *Consumer) Start(consumers ...Params) error {
 func (s *Consumer) handleDelivery(delivery amqp.Delivery) amqp.Action {
 	messageId, err := uuid.Parse(delivery.MessageId)
 	if err != nil {
-		log.Warn("invalid message id: ", delivery.MessageId)
+		log.LogWarn(context.Background(), log.Event{
+			Event:     "mq.message.invalid_id",
+			Message:   "invalid message id",
+			Component: log.ComponentAMQP,
+			Payload: map[string]any{
+				"raw_message_id": delivery.MessageId,
+				"message_type":   delivery.Type,
+			},
+		})
 		return amqp.NackDiscard
 	}
 
 	if !slices.Contains(s.supportedMsgTypes, delivery.Type) {
-		log.Infof("unsupported message type: %s", delivery.Type)
+		log.LogWarn(context.Background(), log.Event{
+			Event:     "mq.message.unsupported_type",
+			Message:   "unsupported message type",
+			Component: log.ComponentAMQP,
+			MessageID: messageId.String(),
+			Payload: map[string]any{
+				"message_type": delivery.Type,
+				"exchange":     delivery.Exchange,
+			},
+		})
 		return amqp.NackDiscard
 	}
 
@@ -77,7 +100,16 @@ func (s *Consumer) handleDelivery(delivery amqp.Delivery) amqp.Action {
 		Body:     delivery.Body,
 	}
 	if err = s.inbox.HandleMessage(msg); err != nil {
-		log.Warn("requeue message ", msg.Id)
+		log.LogWarnError(context.Background(), log.Event{
+			Event:     "mq.message.requeued",
+			Message:   "message requeued",
+			Component: log.ComponentAMQP,
+			MessageID: msg.Id.String(),
+			Payload: map[string]any{
+				"message_type": msg.Type,
+				"exchange":     msg.Exchange,
+			},
+		}, err)
 		return amqp.NackRequeue
 	}
 
