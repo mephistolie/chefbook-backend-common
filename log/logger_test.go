@@ -59,6 +59,24 @@ func TestLogErrorWritesErrorField(t *testing.T) {
 	assertLogField(t, entry, FieldError, "query failed")
 }
 
+func TestCompatibilityLoggerWritesCallsiteEvent(t *testing.T) {
+	buf := bytes.Buffer{}
+	logger = newLogger(&buf, "auth", EnvDev, true)
+	serviceName = "auth"
+
+	Infof("profile %s imported", "user-id")
+
+	entry := decodeLogEntry(t, buf.Bytes())
+	event, ok := entry[FieldEvent].(string)
+	if !ok {
+		t.Fatalf("expected event string, got %#v", entry[FieldEvent])
+	}
+	if event == "legacy.log" || event == "" {
+		t.Fatalf("expected callsite event, got %q", event)
+	}
+	assertLogField(t, entry, "message", "profile user-id imported")
+}
+
 func decodeLogEntry(t *testing.T, data []byte) map[string]any {
 	t.Helper()
 
