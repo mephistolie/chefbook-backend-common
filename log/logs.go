@@ -83,13 +83,69 @@ func LogFatal(ctx context.Context, event Event, err error) {
 	writeEvent(logger.Fatal().Ctx(ctx), event, err)
 }
 
+func AutoTrace(msg ...interface{}) {
+	autoEvent(logger.Trace(), msg...)
+}
+
+func AutoTracef(format string, args ...interface{}) {
+	autoEventf(logger.Trace(), format, args...)
+}
+
+func AutoDebug(msg ...interface{}) {
+	autoEvent(logger.Debug(), msg...)
+}
+
+func AutoDebugf(format string, args ...interface{}) {
+	autoEventf(logger.Debug(), format, args...)
+}
+
+func AutoInfo(msg ...interface{}) {
+	autoEvent(logger.Info(), msg...)
+}
+
+func AutoInfof(format string, args ...interface{}) {
+	autoEventf(logger.Info(), format, args...)
+}
+
+func AutoWarn(msg ...interface{}) {
+	autoEvent(logger.Warn(), msg...)
+}
+
+func AutoWarnf(format string, args ...interface{}) {
+	autoEventf(logger.Warn(), format, args...)
+}
+
+func AutoError(msg ...interface{}) {
+	autoEvent(logger.Error(), msg...)
+}
+
+func AutoErrorf(format string, args ...interface{}) {
+	autoEventf(logger.Error(), format, args...)
+}
+
+func AutoFatal(msg ...interface{}) {
+	autoEvent(logger.Fatal(), msg...)
+}
+
+func AutoFatalf(format string, args ...interface{}) {
+	autoEventf(logger.Fatal(), format, args...)
+}
+
 func legacyEvent(event *zerolog.Event, msg ...interface{}) {
+	autoEvent(event, msg...)
+}
+
+func legacyEventf(event *zerolog.Event, format string, args ...interface{}) {
+	autoEventf(event, format, args...)
+}
+
+func autoEvent(event *zerolog.Event, msg ...interface{}) {
 	event.
 		Str(FieldEvent, callerEventName()).
 		Msg(fmt.Sprint(msg...))
 }
 
-func legacyEventf(event *zerolog.Event, format string, args ...interface{}) {
+func autoEventf(event *zerolog.Event, format string, args ...interface{}) {
 	event.
 		Str(FieldEvent, callerEventName()).
 		Msgf(format, args...)
