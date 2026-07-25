@@ -2,11 +2,12 @@ package sql
 
 import (
 	"fmt"
+
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/pgx/v5"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"log"
+	"github.com/mephistolie/chefbook-backend-common/log"
 )
 
 func Postgres(params Params, migrationsPath string) {
@@ -16,11 +17,11 @@ func Postgres(params Params, migrationsPath string) {
 			params.Driver, *params.User, *params.Password, *params.Host, *params.Port, *params.DB),
 	)
 	if err != nil {
-		log.Fatal(err)
+		log.AutoFatal(err)
 	}
-	log.Print("Connected to database. Applying migrations...")
+	log.AutoInfo("connected to database; applying migrations")
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal(err)
+		log.AutoFatal(err)
 	}
-	log.Print("Migrations applied successfully")
+	log.AutoInfo("migrations applied successfully")
 }
