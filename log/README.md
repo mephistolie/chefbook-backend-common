@@ -2,7 +2,9 @@
 
 ChefBook backend logs should be JSON-only in production and structured-first in new code.
 
-The logger backend is `zerolog`. New code should prefer explicit structured `Event` values. Use `AutoInfof`, `AutoWarnf`, `AutoErrorf`, and related `Auto*` helpers only for low-value technical diagnostics where a callsite-derived `event` is sufficient.
+The logger backend is `zerolog`. The public API accepts only explicit structured
+`Event` values. String-only compatibility helpers and call-site-derived event
+names are intentionally not available.
 
 ## Environment
 
@@ -183,10 +185,7 @@ log.Log(ctx, log.Event{
 })
 ```
 
-For low-value diagnostics that do not justify a custom event yet, use `Auto*` helpers instead of the deprecated compatibility API:
-
-```go
-log.AutoWarnf("unable to parse recipe name: %s", err)
-```
-
-`Auto*` logs are still JSON events. Their `event` is derived from the service, component path, and function name, so they are searchable without keeping ad hoc legacy log lines.
+Service code should keep event construction in its own `internal/logging`
+package. Business and infrastructure layers call typed methods on that
+service-owned event logger instead of constructing `Event` values or payload
+maps at each call site.
