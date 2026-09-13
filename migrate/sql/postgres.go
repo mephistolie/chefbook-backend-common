@@ -14,6 +14,11 @@ import (
 func Postgres(params Params, migrationsPath string) {
 	ctx := context.Background()
 	log.InitWithService("migrations", "", false)
+	// Existing service entrypoints use the pgx name; migrate's v5 adapter
+	// registers itself as pgx5.
+	if params.Driver == "pgx" {
+		params.Driver = "pgx5"
+	}
 
 	m, err := migrate.New(
 		fmt.Sprintf("file://%s", migrationsPath),
