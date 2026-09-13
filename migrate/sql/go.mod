@@ -2,7 +2,10 @@ module github.com/mephistolie/chefbook-backend-common/migrate/sql
 
 go 1.26.2
 
-require github.com/golang-migrate/migrate/v4 v4.19.1
+require (
+	github.com/golang-migrate/migrate/v4 v4.19.1
+	github.com/mephistolie/chefbook-backend-common/log v0.10.0
+)
 
 require (
 	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6 // indirect
@@ -13,7 +16,6 @@ require (
 	github.com/lib/pq v1.12.3 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mephistolie/chefbook-backend-common/log v0.9.0 // indirect
 	github.com/rs/zerolog v1.35.1 // indirect
 	golang.org/x/crypto v0.50.0 // indirect
 	golang.org/x/net v0.53.0 // indirect

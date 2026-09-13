@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -11,17 +12,40 @@ import (
 )
 
 func Postgres(params Params, migrationsPath string) {
+	ctx := context.Background()
+	log.InitWithService("migrations", "", false)
+
 	m, err := migrate.New(
 		fmt.Sprintf("file://%s", migrationsPath),
 		fmt.Sprintf("%s://%s:%s@%s:%d/%s?sslmode=require",
 			params.Driver, *params.User, *params.Password, *params.Host, *params.Port, *params.DB),
 	)
 	if err != nil {
-		log.AutoFatal(err)
+		log.LogFatal(ctx, log.Event{
+			Event:     "postgres.migrations.init_failed",
+			Message:   "failed to initialize database migrations",
+			Component: log.ComponentPostgres,
+			Operation: "initialize_migrations",
+		}, err)
 	}
-	log.AutoInfo("connected to database; applying migrations")
+	log.Log(ctx, log.Event{
+		Event:     "postgres.migrations.started",
+		Message:   "database migrations started",
+		Component: log.ComponentPostgres,
+		Operation: "apply_migrations",
+	})
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.AutoFatal(err)
+		log.LogFatal(ctx, log.Event{
+			Event:     "postgres.migrations.apply_failed",
+			Message:   "failed to apply database migrations",
+			Component: log.ComponentPostgres,
+			Operation: "apply_migrations",
+		}, err)
 	}
-	log.AutoInfo("migrations applied successfully")
+	log.Log(ctx, log.Event{
+		Event:     "postgres.migrations.completed",
+		Message:   "database migrations completed",
+		Component: log.ComponentPostgres,
+		Operation: "apply_migrations",
+	})
 }

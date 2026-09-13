@@ -17,14 +17,14 @@ const (
 
 var (
 	testUserId   = uuid.New()
-	testNickname = "test"
+	testUsername = "test"
 )
 
 func TestJwtGeneration(t *testing.T) {
 	input := Payload{
 		UserId:           testUserId,
 		Email:            testEmail,
-		Nickname:         &testNickname,
+		Username:         &testUsername,
 		Role:             testRole,
 		SubscriptionPlan: testSubscriptionPlan,
 		Deleted:          true,
@@ -49,7 +49,7 @@ func TestJwtGeneration(t *testing.T) {
 
 	if input.UserId != output.UserId ||
 		input.Email != output.Email ||
-		*input.Nickname != *output.Nickname ||
+		*input.Username != *output.Username ||
 		input.Role != output.Role ||
 		input.SubscriptionPlan != output.SubscriptionPlan {
 		t.Fail()

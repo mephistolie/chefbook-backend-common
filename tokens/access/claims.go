@@ -5,7 +5,7 @@ import "github.com/google/uuid"
 const (
 	ClaimUserId           = "sub"
 	ClaimEmail            = "eml"
-	ClaimNickname         = "nik"
+	ClaimUsername         = "usr"
 	ClaimRole             = "rol"
 	ClaimSubscriptionPlan = "pln"
 	ClaimDeleted          = "del"
@@ -17,7 +17,7 @@ const (
 type Payload struct {
 	UserId           uuid.UUID
 	Email            string
-	Nickname         *string
+	Username         *string
 	Role             string
 	SubscriptionPlan string
 	Deleted          bool

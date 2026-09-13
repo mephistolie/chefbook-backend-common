@@ -50,8 +50,8 @@ func (p *Producer) Produce(payload Payload, ttl time.Duration) (string, error) {
 	claims := make(jwt.MapClaims)
 	claims[ClaimUserId] = payload.UserId.String()
 	claims[ClaimEmail] = payload.Email
-	if payload.Nickname != nil {
-		claims[ClaimNickname] = *payload.Nickname
+	if payload.Username != nil {
+		claims[ClaimUsername] = *payload.Username
 	}
 	claims[ClaimRole] = payload.Role
 	claims[ClaimSubscriptionPlan] = payload.SubscriptionPlan
@@ -124,9 +124,9 @@ func (p *Parser) Parse(token string) (Payload, error) {
 		return Payload{}, err
 	}
 	email, _ := claims[ClaimEmail].(string)
-	var nicknamePtr *string = nil
-	if nickname, ok := claims[ClaimNickname].(string); ok && len(nickname) > 0 {
-		nicknamePtr = &nickname
+	var usernamePtr *string = nil
+	if username, ok := claims[ClaimUsername].(string); ok && len(username) > 0 {
+		usernamePtr = &username
 	}
 	role, _ := claims[ClaimRole].(string)
 	plan, _ := claims[ClaimSubscriptionPlan].(string)
@@ -135,7 +135,7 @@ func (p *Parser) Parse(token string) (Payload, error) {
 	return Payload{
 		UserId:           userId,
 		Email:            email,
-		Nickname:         nicknamePtr,
+		Username:         usernamePtr,
 		Role:             role,
 		SubscriptionPlan: plan,
 		Deleted:          deleted,

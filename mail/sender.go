@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"html/template"
-	"log"
 )
 
 type Sender interface {
@@ -20,7 +19,6 @@ type Payload struct {
 func (p *Payload) SetHtmlBody(templateFileName string, data interface{}) error {
 	t, err := template.ParseFiles(templateFileName)
 	if err != nil {
-		log.Printf("failed to parse file %s:%s", templateFileName, err.Error())
 		return err
 	}
 
