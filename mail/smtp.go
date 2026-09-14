@@ -7,19 +7,24 @@ import (
 )
 
 type SmtpSender struct {
-	email   string
-	pass    string
-	host    string
-	port    int
-	timeout time.Duration
+	email    string
+	username string
+	pass     string
+	host     string
+	port     int
+	timeout  time.Duration
 }
 
-func NewSmtpSender(email, pass, host string, port int, timeout time.Duration) (*SmtpSender, error) {
+func NewSmtpSender(email, pass, host string, port int, timeout time.Duration, username ...string) (*SmtpSender, error) {
 	if !isEmailValid(email) {
 		return nil, errors.New("invalid email email")
 	}
 
-	return &SmtpSender{email: email, pass: pass, host: host, port: port, timeout: timeout}, nil
+	login := email
+	if len(username) > 0 && username[0] != "" {
+		login = username[0]
+	}
+	return &SmtpSender{email: email, username: login, pass: pass, host: host, port: port, timeout: timeout}, nil
 }
 
 func (s *SmtpSender) Send(payload Payload, attempts int) error {
@@ -33,7 +38,7 @@ func (s *SmtpSender) Send(payload Payload, attempts int) error {
 	msg.SetHeader("Subject", payload.Subject)
 	msg.SetBody("text/html", payload.Body)
 
-	dialer := gomail.NewDialer(s.host, s.port, s.email, s.pass)
+	dialer := gomail.NewDialer(s.host, s.port, s.username, s.pass)
 
 	var err error = nil
 	for i := 0; i < attempts; i++ {
