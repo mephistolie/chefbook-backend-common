@@ -3,6 +3,7 @@ package mail
 import (
 	"errors"
 	"github.com/go-gomail/gomail"
+	"net/mail"
 	"time"
 )
 
@@ -16,15 +17,16 @@ type SmtpSender struct {
 }
 
 func NewSmtpSender(email, pass, host string, port int, timeout time.Duration, username ...string) (*SmtpSender, error) {
-	if !isEmailValid(email) {
-		return nil, errors.New("invalid email email")
+	from, err := mail.ParseAddress(email)
+	if err != nil || !isEmailValid(from.Address) {
+		return nil, errors.New("invalid sender email")
 	}
 
-	login := email
+	login := from.Address
 	if len(username) > 0 && username[0] != "" {
 		login = username[0]
 	}
-	return &SmtpSender{email: email, username: login, pass: pass, host: host, port: port, timeout: timeout}, nil
+	return &SmtpSender{email: from.String(), username: login, pass: pass, host: host, port: port, timeout: timeout}, nil
 }
 
 func (s *SmtpSender) Send(payload Payload, attempts int) error {
